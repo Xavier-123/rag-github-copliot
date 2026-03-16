@@ -1,0 +1,36 @@
+# Core LLM
+openai>=1.12.0
+
+# Configuration
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+python-dotenv>=1.0.0
+
+# Retrieval backends
+chromadb>=0.4.0             # ChromaDB vector store
+rank-bm25>=0.2.2            # BM25 sparse retrieval for HybridRetriever
+# faiss-cpu>=1.7.4          # Uncomment for FAISS backend
+# pymilvus>=2.3.0           # Uncomment for Milvus backend
+# weaviate-client>=4.0.0    # Uncomment for Weaviate backend
+# neo4j>=5.0.0              # Uncomment for GraphRAG / Neo4j
+
+# Memory
+redis>=4.6.0               # Redis for persistent conversation/episodic memory
+
+# Evaluation
+# ragas>=0.1.0              # Uncomment for RAGAS evaluation framework
+# datasets>=2.14.0          # Required by RAGAS
+
+# Self-Improvement
+# dspy-ai>=2.4.0            # Uncomment for DSPy-based prompt optimization
+
+# Utilities
+tenacity>=8.2.0            # Retry logic
+httpx>=0.25.0              # Async HTTP client
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+
+# Optional: web search providers
+# (No extra packages needed; uses urllib from stdlib)
