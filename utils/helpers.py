@@ -45,6 +45,29 @@ def get_logger(name: str) -> logging.Logger:
 # LLM & Embedding client factories
 # ---------------------------------------------------------------------------
 
+def is_llm_available() -> bool:
+    """
+    Return ``True`` when a real LLM can be reached; ``False`` in mock/offline mode.
+
+    A real LLM is considered available when **any** of the following is true:
+
+    - An OpenAI API key is configured (``settings.openai_api_key``).
+    - An Azure OpenAI API key is configured (``settings.azure_openai_api_key``).
+    - A custom ``base_url`` is configured for the OpenAI provider
+      (``settings.openai_base_url``), which covers OpenAI-compatible services
+      such as Ollama, DeepSeek, or other self-hosted endpoints that may not
+      require a traditional API key.
+
+    Returns:
+        ``True`` if an LLM endpoint is reachable, ``False`` otherwise.
+    """
+    if settings.openai_api_key or settings.azure_openai_api_key:
+        return True
+    if settings.llm_provider == LLMProvider.OPENAI and settings.openai_base_url:
+        return True
+    return False
+
+
 def build_llm_client() -> Any:
     """
     Build and return the appropriate LLM client based on ``settings.llm_provider``.
@@ -53,6 +76,10 @@ def build_llm_client() -> Any:
     -------------------
     - ``LLMProvider.OPENAI``       – uses ``openai.OpenAI``
     - ``LLMProvider.AZURE_OPENAI`` – uses ``openai.AzureOpenAI``
+
+    When ``settings.openai_base_url`` is set, it is forwarded as the ``base_url``
+    parameter, enabling any OpenAI-compatible service (e.g. Ollama, DeepSeek,
+    SiliconFlow) to be used as a drop-in replacement.
 
     Returns:
         An OpenAI-compatible chat client instance.
@@ -69,7 +96,16 @@ def build_llm_client() -> Any:
         ) from exc
 
     if settings.llm_provider == LLMProvider.OPENAI:
-        return openai.OpenAI(api_key=settings.openai_api_key)
+        kwargs: Dict[str, Any] = {}
+        if settings.openai_base_url:
+            kwargs["base_url"] = settings.openai_base_url
+        # When a custom base_url is used without an explicit API key (e.g. Ollama),
+        # provide a placeholder so the openai library does not raise an
+        # AuthenticationError before the request reaches the endpoint.
+        kwargs["api_key"] = settings.openai_api_key or (
+            "ollama" if settings.openai_base_url else None
+        )
+        return openai.OpenAI(**kwargs)
 
     if settings.llm_provider == LLMProvider.AZURE_OPENAI:
         return openai.AzureOpenAI(

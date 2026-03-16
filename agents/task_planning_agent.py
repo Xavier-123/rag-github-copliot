@@ -34,8 +34,7 @@ from typing import Any, Dict, List, Optional
 
 from agents.base_agent import AgentInput, AgentOutput, BaseAgent
 from agents.query_understanding_agent import QueryUnderstanding
-from config.settings import settings
-from utils.helpers import build_llm_client, get_model_name
+from utils.helpers import build_llm_client, get_model_name, is_llm_available
 
 
 # ---------------------------------------------------------------------------
@@ -153,8 +152,7 @@ class TaskPlanningAgent(BaseAgent):
         return self._llm
 
     def _call_llm(self, system_prompt: str, user_prompt: str) -> str:
-        api_key = settings.openai_api_key or settings.azure_openai_api_key
-        if not api_key:
+        if not is_llm_available():
             return "__MOCK__"
         client = self._get_llm()
         response = client.chat.completions.create(

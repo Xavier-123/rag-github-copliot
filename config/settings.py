@@ -59,6 +59,15 @@ class Settings(BaseSettings):
 
     # OpenAI
     openai_api_key: Optional[str] = Field(default=None, description="OpenAI API key.")
+    openai_base_url: Optional[str] = Field(
+        default=None,
+        description=(
+            "Custom base URL for OpenAI-compatible services "
+            "(e.g. 'http://localhost:11434/v1' for Ollama, or a third-party "
+            "OpenAI-compatible endpoint). Leave unset to use the default "
+            "OpenAI API URL."
+        ),
+    )
     openai_model: str = Field(
         default="gpt-4o", description="Default OpenAI chat model."
     )

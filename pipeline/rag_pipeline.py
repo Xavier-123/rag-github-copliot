@@ -100,7 +100,7 @@ from memory.conversation_memory import ConversationMemory
 from memory.episodic_memory import EpisodicMemory
 from optimization.feedback_learning import FeedbackLearning
 from optimization.system_optimizer import SystemOptimizer
-from utils.helpers import build_llm_client, get_logger, get_model_name, truncate_text
+from utils.helpers import build_llm_client, get_logger, get_model_name, is_llm_available, truncate_text
 
 
 logger = get_logger("RAGPipeline")
@@ -475,8 +475,7 @@ class RAGPipeline:
         Returns:
             Generated answer string.
         """
-        api_key = settings.openai_api_key or settings.azure_openai_api_key
-        if not api_key:
+        if not is_llm_available():
             return (
                 f"[Mock Answer] Based on the retrieved context, here is a response "
                 f"to your query: '{query}'. "

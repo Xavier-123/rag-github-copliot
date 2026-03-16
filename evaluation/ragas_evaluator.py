@@ -20,9 +20,8 @@ from __future__ import annotations
 
 from typing import Any, List, Optional
 
-from config.settings import settings
 from evaluation.evaluator import EvaluationResult
-from utils.helpers import get_logger
+from utils.helpers import get_logger, is_llm_available
 
 
 logger = get_logger("RagasEvaluator")
@@ -127,9 +126,8 @@ class RagasEvaluator:
             }
             dataset = Dataset.from_dict(data)
 
-            api_key = settings.openai_api_key or settings.azure_openai_api_key
-            if not api_key:
-                logger.warning("No API key; RAGAS will use mock scores.")
+            if not is_llm_available():
+                logger.warning("No LLM configured; RAGAS will use mock scores.")
                 return EvaluationResult(
                     faithfulness=0.7,
                     answer_relevance=0.7,
