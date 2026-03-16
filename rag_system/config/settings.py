@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import os
 from typing import Optional
-from dotenv import find_dotenv, load_dotenv
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -152,21 +151,9 @@ class Settings(BaseSettings):
 _settings_instance: Optional[Settings] = None
 
 
-def reset_settings() -> None:
-    """重置全局配置单例（用于测试或重新加载配置）"""
-    global _settings_instance
-    _settings_instance = None
-
-
 def get_settings() -> Settings:
     """获取全局配置单例"""
     global _settings_instance
     if _settings_instance is None:
-        # 将 .env 文件中的变量加载到 os.environ，确保子配置类
-        # （LLMSettings、EmbeddingSettings 等）能通过环境变量读取到值。
-        # pydantic-settings 读取 env_file 时不会修改 os.environ，
-        # 而子配置类通过 default_factory 独立实例化，需要从 os.environ 获取值。
-        _env_path = find_dotenv(usecwd=True)
-        load_dotenv(_env_path or ".env", override=False)
         _settings_instance = Settings()
     return _settings_instance
