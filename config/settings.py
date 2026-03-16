@@ -15,12 +15,15 @@ Usage:
 
 from __future__ import annotations
 
-import os
 from enum import Enum
+from pathlib import Path
 from typing import Optional
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings
+
+# Absolute path to the project root (two levels up from this file: config/ → root)
+_ROOT_DIR = Path(__file__).resolve().parent.parent
 
 
 class LLMProvider(str, Enum):
@@ -219,7 +222,8 @@ class Settings(BaseSettings):
         return v
 
     model_config = {
-        "env_file": ".env",
+        "env_prefix": "RAG_",
+        "env_file": str(_ROOT_DIR / ".env"),
         "env_file_encoding": "utf-8",
         "case_sensitive": False,
         "extra": "ignore",
