@@ -24,7 +24,7 @@ from typing import Any, Dict, List, Optional
 
 from config.settings import settings
 from retrieval.base_retriever import BaseRetriever
-from utils.helpers import build_embedding_client, get_embedding_model_name
+from utils.helpers import build_embedding_client, get_embedding_model_name, is_llm_available
 
 
 class VectorRetriever(BaseRetriever):
@@ -102,9 +102,8 @@ class VectorRetriever(BaseRetriever):
         Returns:
             Dense embedding vector.
         """
-        api_key = settings.openai_api_key or settings.azure_openai_api_key
-        if not api_key:
-            self.logger.warning("No API key – returning mock zero embedding.")
+        if not is_llm_available():
+            self.logger.warning("No LLM configured – returning mock zero embedding.")
             return [0.0] * 1536  # text-embedding-3-small dimension
 
         if self._embed_client is None:

@@ -32,9 +32,8 @@ from __future__ import annotations
 import json
 from typing import Any, Dict, List, Optional
 
-from config.settings import settings
 from evaluation.evaluator import EvaluationResult
-from utils.helpers import build_llm_client, get_model_name, truncate_text
+from utils.helpers import build_llm_client, get_model_name, is_llm_available, truncate_text
 
 
 class LLMJudge:
@@ -113,9 +112,8 @@ class LLMJudge:
         Returns:
             Dict with ``"score"`` (0–10) and ``"explanation"`` keys.
         """
-        api_key = settings.openai_api_key or settings.azure_openai_api_key
-        if not api_key:
-            return {"score": 7, "explanation": "Mock evaluation (no API key)."}
+        if not is_llm_available():
+            return {"score": 7, "explanation": "Mock evaluation (no LLM configured)."}
 
         try:
             client = self._get_llm()

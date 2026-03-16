@@ -35,8 +35,7 @@ from dataclasses import asdict, dataclass
 from typing import Any, Dict, List, Optional
 
 from agents.base_agent import AgentInput, AgentOutput, BaseAgent
-from config.settings import settings
-from utils.helpers import build_llm_client, get_model_name
+from utils.helpers import build_llm_client, get_model_name, is_llm_available
 
 
 # ---------------------------------------------------------------------------
@@ -150,13 +149,10 @@ class QueryUnderstandingAgent(BaseAgent):
         """
         Call the configured LLM and return the text response.
 
-        Falls back to a clearly labelled mock string if the API key is absent.
+        Falls back to a clearly labelled mock string if no LLM is configured.
         """
-        api_key = (
-            settings.openai_api_key or settings.azure_openai_api_key
-        )
-        if not api_key:
-            self.logger.warning("No API key configured – using mock LLM response.")
+        if not is_llm_available():
+            self.logger.warning("No LLM configured – using mock LLM response.")
             return "__MOCK__"
 
         client = self._get_llm()

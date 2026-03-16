@@ -35,12 +35,12 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 
 from agents.base_agent import AgentInput, AgentOutput, BaseAgent
-from config.settings import settings
 from utils.helpers import (
     build_llm_client,
     deduplicate_documents,
     format_documents_for_context,
     get_model_name,
+    is_llm_available,
     truncate_text,
 )
 
@@ -160,11 +160,10 @@ class ContextEngineeringAgent(BaseAgent):
         Returns:
             List of documents, some with compressed ``content``.
         """
-        api_key = settings.openai_api_key or settings.azure_openai_api_key
         compressed = []
         for doc in documents:
             content = doc.get("content", "")
-            if len(content) > self._COMPRESSION_THRESHOLD_CHARS and api_key:
+            if len(content) > self._COMPRESSION_THRESHOLD_CHARS and is_llm_available():
                 summary = self._summarise_document(content, query)
                 doc = {**doc, "content": summary, "compressed": True}
             compressed.append(doc)

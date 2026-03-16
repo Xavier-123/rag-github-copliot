@@ -31,7 +31,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from agents.base_agent import AgentInput, AgentOutput, BaseAgent
 from config.settings import settings
-from utils.helpers import build_llm_client, get_model_name
+from utils.helpers import build_llm_client, get_model_name, is_llm_available
 
 
 class RerankAgent(BaseAgent):
@@ -124,8 +124,7 @@ class RerankAgent(BaseAgent):
         Returns:
             List of ``(score, document)`` tuples.
         """
-        api_key = settings.openai_api_key or settings.azure_openai_api_key
-        if not api_key:
+        if not is_llm_available():
             # Mock: assign descending scores to preserve original order
             return [(10.0 - i, doc) for i, doc in enumerate(documents)]
 
